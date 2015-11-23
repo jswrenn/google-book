@@ -1,4 +1,6 @@
-# seed-element
+# Google Book 
+Built upon the seed-element starter kit for creating reusable Polymer elements. Seed-Element readme left intact for my own reference:
+
 
 An element providing a starting point for your own reusable Polymer elements.
 
