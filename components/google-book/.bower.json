@@ -1,0 +1,40 @@
+{
+  "name": "google-book",
+  "authors": [
+    "Anonymous <anonymous@example.com>"
+  ],
+  "description": "An element providing a solution to no problem in particular.",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "seed"
+  ],
+  "main": "google-book.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/<USERNAME>/seed-element/",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "google-apis": "~1.1.3",
+    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#~1.0.2"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "*"
+  },
+  "_release": "8b9aa6369d",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "8b9aa6369d6c52f1007e8bb5eb4b7d0e1459f75f"
+  },
+  "_source": "git://github.com/jswrenn/google-book.git",
+  "_target": "master",
+  "_originalSource": "jswrenn/google-book",
+  "_direct": true
+}

@@ -1,0 +1,162 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../google-apis/google-legacy-loader.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<!--
+An element providing a solution to no problem in particular.
+
+Example:
+
+    <google-book isbn="1234567890" page-id="PA5" />
+
+@demo
+-->
+<dom-module id="google-book">
+  <style>
+    :host {
+      display: block;
+      box-sizing: border-box;
+    }
+    #wrapper { position:relative; height: 100%; width: 100%;}
+  </style>
+  <template>
+    <menu type="context" id="imagemenu">
+      <menuitem id="action-zoom-inc"  label="Zoom In"></menuitem>
+      <menuitem id="action-zoom-dec"  label="Zoom Out"></menuitem>
+      <menuitem id="action-goto-page" label="Goto Page"></menuitem>
+    </menu>
+    <google-legacy-loader
+        id="loader"
+        api="google"
+        on-api-load="_loaded"></google-legacy-loader>
+    <div id="wrapper" contextmenu="imagemenu"></div>
+  </template>
+
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'google-book',
+    
+    
+    behaviors: [
+      Polymer.IronResizableBehavior
+    ],
+    
+    listeners: {
+      'iron-resize': '_onIronResize',
+      'action-zoom-inc.click'  : 'zoomIn',
+      'action-zoom-dec.click'  : 'zoomOut',
+      'action-goto-page.click' : '_pageDialog',
+    },
+    
+    attached: function() {
+      this.async(this.notifyResize, 1);
+    },
+    
+    _onIronResize: function() {
+      if(typeof this._gapi !== 'undefined') {
+        this._gapi.resize();
+      }
+    },
+    
+    properties: {
+      /**
+       * ISBN of the book to show.
+       *
+       * @type {{isbn: string}}
+       */
+      isbn : {type:String,reflectToAttribute:true,observer:'_isbnChange'},
+      'page-id' : {
+        type:String,
+        notify: true,
+        reflectToAttribute:true,
+      }
+    },
+
+    _pageDialog : function() {
+      this.gotoPageId(prompt("Enter a page number."));
+    },
+    
+    _isbnChange(o,n){
+      if(o != n && typeof this._gapi !== 'undefined') {
+        this._gapi.load('ISBN:'+n, function(s){console.log(s);});
+      }
+    },
+    
+    _pageIdChange(o,n) {
+      if(o != n && typeof this._gapi !== 'undefined') {
+        this._gapi.goToPageId(n);
+        //this.set('pageId', this._gapi.getPageNumber());
+      }
+    },
+    
+    /** Go to the next page in the book. */
+    nextPage : function() {
+      if(typeof this._gapi !== 'undefined')
+        return this._gapi.nextPage();
+    },
+    /** Go to the previous page in the book. */
+    previousPage : function() {
+      if(typeof this._gapi !== 'undefined')
+        return this._gapi.previousPage();
+    },
+    /** Zoom into the viewer. */
+    zoomIn : function() {
+      if(typeof this._gapi !== 'undefined')
+        return this._gapi.zoomIn();
+    },
+    /** Zoom out of the viewer. */
+    zoomOut : function() {
+      if(typeof this._gapi !== 'undefined')
+        return this._gapi.zoomOut();
+    },
+    /** Goto a given page number. */
+    gotoPageNumber : function(n) {
+      if(typeof this._gapi !== 'undefined')
+        return this._gapi.goToPage(n);
+    },
+    /** Goto a page using its identifier. */
+    gotoPageId : function(n) {
+      if(typeof this._gapi !== 'undefined')
+        return this._gapi.goToPage(n);
+    },
+    
+    _loaded: function() {
+      var $ = this;
+      google.load("books", "1",{"callback" : 
+      function() {
+        $._gapi = new google.books.DefaultViewer(
+          document.getElementById("wrapper"),{ 'showLinkChrome': 'false' });
+        $._gapi.load('ISBN:'+$.isbn, null, function(){
+          if($.hasAttribute("page-id"))
+            $._gapi.gotoPageId($.getAttribute("page-id"));
+          else
+            $.setAttribute("page-id", $._gapi.getPageId());
+        });
+        document.querySelector("#wrapper > div > div")
+          .removeChild(document.querySelector("#wrapper > div > div > div:nth-child(2)"));
+        document.querySelector("#wrapper > div")
+          .removeChild(document.querySelector("#wrapper > div > div:nth-child(2)"));
+        document.querySelector("#wrapper > div > div > div:nth-child(1)")
+          .addEventListener("scroll", function() {
+            $.set('page-id', $._gapi.getPageId());
+          });
+      }});
+    },
+    
+    // Element Lifecycle
+    ready: function() {},
+
+    detached: function() {},
+  });
+
+</script>
